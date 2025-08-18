@@ -12,5 +12,6 @@ jobs:
           node-version: 20
       - run: corepack enable
       - run: pnpm i
+      - run: pnpm prisma generate
       - run: pnpm -r build
       - run: pnpm -r lint

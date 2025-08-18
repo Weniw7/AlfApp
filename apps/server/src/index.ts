@@ -1,22 +1,19 @@
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-// Load root .env (../../.env from apps/server/src)
-dotenv.config({ path: path.resolve(__dirname, "../../..", ".env") });
-
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
-import { PrismaClient } from "@prisma/client";
 
 const app = express();
-const prisma = new PrismaClient();
-
 app.use(cors());
 app.use(express.json());
 
-const messages: string[] = [
+type AnswerPayload = {
+  q1: string;
+  q2: string;
+  q3: string;
+  q4: string;
+};
+
+// MESSAGES (20)
+const MESSAGES: string[] = [
   "La idea no te hará libre; la ejecución sí. Empieza hoy.",
   "Mide, mejora, repite. El progreso diario gana batallas.",
   "Vende antes de construir: valida y luego escala.",
@@ -39,50 +36,43 @@ const messages: string[] = [
   "El mejor momento para empezar fue ayer. El segundo mejor es ahora."
 ];
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-app.get("/api/health", (_req, res) => {
+// Health
+app.get("/api/health", (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
-app.get("/api/messages", (_req, res) => {
-  res.json(shuffle(messages));
+// Mensajes
+app.get("/api/messages", (_req: Request, res: Response) => {
+  res.json(MESSAGES);
 });
 
-app.post("/api/answers", async (req, res) => {
-  const { q1, q2, q3, q4 } = req.body ?? {};
-  if (
-    typeof q1 !== "string" ||
-    typeof q2 !== "string" ||
-    typeof q3 !== "string" ||
-    typeof q4 !== "string" ||
-    !q1.trim() || !q2.trim() || !q3.trim() || !q4.trim()
-  ) {
-    return res.status(400).json({ error: "Campos inválidos" });
+// Guardar respuestas (placeholder; integra Prisma cuando quieras)
+app.post("/api/answers", (req: Request, res: Response) => {
+  const body = req.body as Partial<AnswerPayload>;
+  const q1 = body.q1 ?? "";
+  const q2 = body.q2 ?? "";
+  const q3 = body.q3 ?? "";
+  const q4 = body.q4 ?? "";
+
+  if (!q1 || !q2 || !q3 || !q4) {
+    return res.status(400).json({ error: "Faltan campos q1..q4" });
   }
 
-  try {
-    const created = await prisma.userAnswer.create({
-      data: { q1, q2, q3, q4 },
-      select: { id: true },
-    });
-    res.status(201).json(created);
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
-    res.status(500).json({ error: "Error al guardar" });
-  }
+  const id = cryptoRandomId();
+  return res.json({ id });
 });
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
+function cryptoRandomId(): string {
+  // @ts-ignore Node 18/20 global crypto
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    // @ts-ignore
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).slice(2);
+}
+
+const PORT = Number(process.env.PORT ?? 4000);
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`API listening on http://localhost:${PORT}`);
+  console.log(`Server listening on http://localhost:${PORT}`);
 });
