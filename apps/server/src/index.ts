@@ -1,3 +1,11 @@
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Load root .env (../../.env from apps/server/src)
+dotenv.config({ path: path.resolve(__dirname, "../../..", ".env") });
+
 import express from "express";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
