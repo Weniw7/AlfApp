@@ -1,0 +1,25 @@
+{
+  "name": "alfapp-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -r dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write .",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "eslint": "^9.7.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.34.3",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "prettier": "^3.3.3"
+  }
+}
+
