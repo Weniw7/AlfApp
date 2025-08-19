@@ -63,9 +63,8 @@ app.post("/api/answers", (req: Request, res: Response) => {
 });
 
 function cryptoRandomId(): string {
-  // @ts-ignore Node 18/20 global crypto
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    // @ts-ignore
+    // @ts-expect-error Node 18/20 provide crypto.randomUUID
     return crypto.randomUUID();
   }
   return Math.random().toString(36).slice(2);
@@ -73,6 +72,5 @@ function cryptoRandomId(): string {
 
 const PORT = Number(process.env.PORT ?? 4000);
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`Server listening on http://localhost:${PORT}`);
 });
