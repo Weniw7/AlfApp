@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import { randomUUID } from "node:crypto";
 
 const app = express();
 app.use(cors());
@@ -12,7 +13,6 @@ type AnswerPayload = {
   q4: string;
 };
 
-// MESSAGES (20)
 const MESSAGES: string[] = [
   "La idea no te hará libre; la ejecución sí. Empieza hoy.",
   "Mide, mejora, repite. El progreso diario gana batallas.",
@@ -36,17 +36,14 @@ const MESSAGES: string[] = [
   "El mejor momento para empezar fue ayer. El segundo mejor es ahora."
 ];
 
-// Health
 app.get("/api/health", (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
-// Mensajes
 app.get("/api/messages", (_req: Request, res: Response) => {
   res.json(MESSAGES);
 });
 
-// Guardar respuestas (placeholder; integra Prisma cuando quieras)
 app.post("/api/answers", (req: Request, res: Response) => {
   const body = req.body as Partial<AnswerPayload>;
   const q1 = body.q1 ?? "";
@@ -58,19 +55,19 @@ app.post("/api/answers", (req: Request, res: Response) => {
     return res.status(400).json({ error: "Faltan campos q1..q4" });
   }
 
-  const id = cryptoRandomId();
+  const id = makeId();
   return res.json({ id });
 });
 
-function cryptoRandomId(): string {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    // @ts-expect-error Node 18/20 provide crypto.randomUUID
-    return crypto.randomUUID();
+function makeId(): string {
+  try {
+    return randomUUID();
+  } catch {
+    return Math.random().toString(36).slice(2);
   }
-  return Math.random().toString(36).slice(2);
 }
 
-const PORT = Number(process.env.PORT ?? 4000);
+const PORT = Number.parseInt(process.env.PORT ?? "4000", 10);
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });
