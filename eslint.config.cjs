@@ -1,12 +1,27 @@
-// eslint.config.cjs (flat config para ESLint v9 en CJS)
+// eslint.config.cjs — Flat config (ESLint v9) en CJS
 const js = require('@eslint/js');
 const tseslint = require('typescript-eslint');
 const react = require('eslint-plugin-react');
 
 module.exports = [
-  { ignores: ['**/dist/**', '**/node_modules/**', '**/build/**'] },
+  // Ignora outputs, dependencias y **archivos de configuración**
+  {
+    ignores: [
+      '**/dist/**',
+      '**/build/**',
+      '**/node_modules/**',
+      'eslint.config.*',
+      '**/.eslintrc.*',
+      '**/*.config.js',
+      '**/*.config.cjs'
+    ]
+  },
+
+  // Base JS + TS recomendadas (sin type-check por rapidez en CI)
   js.configs.recommended,
-  ...tseslint.configs.recommended, // rápido en CI, sin type-check
+  ...tseslint.configs.recommended,
+
+  // React en el front
   {
     files: ['apps/web/**/*.{ts,tsx}'],
     plugins: { react },
@@ -17,11 +32,22 @@ module.exports = [
       'react/react-in-jsx-scope': 'off'
     }
   },
+
+  // Server (permitimos console)
   {
     files: ['apps/server/**/*.ts'],
+    rules: { 'no-console': 'off' }
+  },
+
+  // Para cualquier archivo .cjs (como este config): Node + permitir require
+  {
+    files: ['**/*.cjs'],
+    languageOptions: {
+      sourceType: 'script'
+    },
     rules: {
-      // permitimos logs en el server
-      'no-console': 'off'
+      'no-undef': 'off', // module/require
+      '@typescript-eslint/no-var-requires': 'off'
     }
   }
 ];

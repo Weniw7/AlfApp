@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "pnpm -r dev",
     "build": "pnpm -r build",
-    "lint": "eslint .",
+    "lint": "eslint apps",
     "format": "prettier --write .",
     "typecheck": "pnpm -r typecheck",
     "prisma": "prisma",
