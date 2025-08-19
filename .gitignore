@@ -1,0 +1,29 @@
+# Node
+node_modules/
+.pnpm-store/
+
+# Build outputs
+apps/**/dist/
+apps/**/build/
+
+# Env
+.env
+apps/**/.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Prisma DB
+prisma/dev.db*
+
+# Lockfile
+pnpm-lock.yaml
